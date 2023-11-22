@@ -1,6 +1,4 @@
-import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output
+import streamlit as st
 import pandas as pd
 import plotly.express as px
 
@@ -8,26 +6,28 @@ import plotly.express as px
 url = "/content/day.csv"  # Gantilah link dengan link dataset yang sesuai
 bike_data = pd.read_csv(url)
 
-# Inisialisasi aplikasi Dash
-app = dash.Dash(__name__)
+# Set the title of the web app
+st.title("Bike Sharing Dashboard")
 
-# Layout dari dashboard
-app.layout = html.Div([
-    html.H1("Bike Sharing Dashboard"),
-    
-    # Grafik tren rata-rata sepeda yang disewa per jam
-    dcc.Graph(
-        id='hourly-trend',
-        figure=px.line(bike_data, x='hr', y='cnt', title='Tren Rata-rata Jumlah Sepeda yang Disewa per Jam')
-    ),
+# Add a section for data exploration
+st.header("Data Exploration")
 
-    # Grafik jumlah total sepeda yang disewa selama peristiwa Hurricane Sandy
-    dcc.Graph(
-        id='sandy-event',
-        figure=px.line(bike_data[(bike_data['dteday'] >= '2012-10-29') & (bike_data['dteday'] <= '2012-10-31')],
-                       x='dteday', y='cnt', title='Jumlah Total Sepeda yang Disewa Selama Periode Hurricane Sandy')
-    ),
-])
+# Display the first few rows of the dataset
+st.write("### Bike Sharing Data Overview")
+st.write(bike_data.head())
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# Display summary statistics
+st.write("### Summary Statistics")
+st.write(bike_data.describe())
+
+# Add a section for visualizations
+st.header("Visualizations")
+
+# Line chart: Hourly trend of bike rental count
+hourly_trend_chart = px.line(bike_data, x='hr', y='cnt', title='Hourly Trend of Bike Rental Count')
+st.plotly_chart(hourly_trend_chart)
+
+# Line chart: Total bike rental count during Hurricane Sandy event
+sandy_event_chart = px.line(bike_data[(bike_data['dteday'] >= '2012-10-29') & (bike_data['dteday'] <= '2012-10-31')],
+                            x='dteday', y='cnt', title='Total Bike Rental Count During Hurricane Sandy Event')
+st.plotly_chart(sandy_event_chart)
